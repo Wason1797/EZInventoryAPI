@@ -137,7 +137,7 @@ class Stock(PostgreSqlConnector.Base):
     __tablename__ = 'stock'
 
     uuid = sqla.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    prduct_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('product.uuid'))
+    product_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('product.uuid'))
     current_ammount = sqla.Column(sqla.Integer(), nullable=False)
     changed_by = sqla.Column(sqla.Integer(), nullable=False)
     operation = sqla.Column(sqla.Enum(OperationConstants))
@@ -171,7 +171,7 @@ class ProductProviders(PostgreSqlConnector.Base):
 
     uuid = sqla.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
 
-    product_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('prduct.uuid'))
+    product_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('product.uuid'))
     provider_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('provider.uuid'))
 
     product = relationship(
@@ -204,7 +204,7 @@ class Invoice(TemporalTracking):
     __tablename__ = 'invoice'
 
     uuid = sqla.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    product_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('prduct.uuid'))
+    product_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('product.uuid'))
     customer_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('provider.uuid'))
     product_ammount = sqla.Column(sqla.Integer(), nullable=False)
     # NOTE: We store prices as an integer ammount of cents to avoid presicion errors
