@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 class PostgreSqlConnector:
     engine = create_async_engine(EnvManager.DB_URL, echo=True)
     SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    Basse = Base
+    Base = Base
 
     @classmethod
     async def get_db(cls) -> AsyncSession:
