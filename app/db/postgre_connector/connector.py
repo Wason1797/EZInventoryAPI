@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from app.db import Base
-from app.utils.env_manager import EnvManager
+from app.utils.env_config import EnvConfig
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -13,7 +13,7 @@ class PostgreSqlConnector:
     @classmethod
     def init_db_engine(cls) -> None:
         if not cls.engine:
-            cls.engine = create_async_engine(EnvManager.DB_URL, echo=True)
+            cls.engine = create_async_engine(EnvConfig.DB_URL, echo=True)
 
     @classmethod
     def init_db_session(cls) -> None:
