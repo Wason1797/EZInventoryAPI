@@ -14,7 +14,7 @@ class BaseTable(PostgreSqlConnector.Base):
 
     created_on = sqla.Column(sqla.DateTime(), default=datetime.utcnow)
     updated_on = sqla.Column(sqla.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    status = sqla.Column(sqla.Enum(StatusConstants))
+    status = sqla.Column(sqla.Enum(StatusConstants), default=StatusConstants.ACTIVE)
     activated_on = sqla.Column(sqla.DateTime(), nullable=True)
     deleted_on = sqla.Column(sqla.DateTime(), nullable=True)
     reactivated_on = sqla.Column(sqla.DateTime(), nullable=True)
@@ -132,12 +132,12 @@ class Product(ProductBase):
     tenant = relationship(
         'Tenant',
         primaryjoin=f"and_(Product.tenant_uuid==Tenant.uuid, Tenant.status!='{StatusConstants.DELETED}')",
-        backref=backref('products', order_by=uuid))
+        backref=backref('products'))
 
     category = relationship(
         'Category',
         primaryjoin=f"and_(Product.category_uuid==Category.uuid, Category.status!='{StatusConstants.DELETED}')",
-        backref=backref('products', order_by=uuid))
+        backref=backref('products'))
 
     def __repr__(self) -> str:
         return f'Product[{self.uuid}] {self.name}'
@@ -227,7 +227,7 @@ class Invoice(BaseTable):
 
     uuid = sqla.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     product_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('product.uuid'))
-    customer_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('provider.uuid'))
+    customer_uuid = sqla.Column(UUID(as_uuid=True), sqla.ForeignKey('customer.uuid'))
     product_ammount = sqla.Column(sqla.Integer(), nullable=False)
     # NOTE: We store prices as an integer ammount of cents to avoid presicion errors
     product_unit_price = sqla.Column(sqla.Integer(), nullable=False)
