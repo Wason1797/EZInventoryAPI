@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 flake8 = "*"
 autopep8 = "*"
+aiosqlite = "*"
+requests = "*"
 
 [packages]
 fastapi = "*"
@@ -16,6 +18,7 @@ psycopg2-binary = "*"
 pytest = "*"
 alembic = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
+email-validator = "*"
 
 [requires]
 python_version = "3.8"
