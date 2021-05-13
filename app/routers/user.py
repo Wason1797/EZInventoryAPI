@@ -13,6 +13,6 @@ async def get_user(uuid: str, db: AsyncSession = Depends(PostgreSqlConnector.get
     return await UserManager.fetch_by_uuid(db, uuid)
 
 
-@router.post('/', response_model=UserSerializer)
+@router.post('', response_model=UserSerializer)
 async def create_user(user: UserCreateSerializer, db: AsyncSession = Depends(PostgreSqlConnector.get_db)):
     return await UserManager.create_user(db, user)
