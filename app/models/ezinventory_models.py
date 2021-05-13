@@ -23,7 +23,7 @@ class BaseTable(PostgreSqlConnector.Base):
 class Tenant(BaseTable):
     __tablename__ = 'tenant'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = sqla.Column(sqla.String(100), nullable=False)
     main_address = sqla.Column(sqla.JSON(none_as_null=False), nullable=False)
     phone = sqla.Column(sqla.String(15))
@@ -37,7 +37,7 @@ class Tenant(BaseTable):
 class User(BaseTable):
     __tablename__ = 'user'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     username = sqla.Column(sqla.String(200), nullable=False, unique=True, index=True)
     password = sqla.Column(sqla.String(300), nullable=False)
     email = sqla.Column(sqla.String(), nullable=False)
@@ -62,9 +62,9 @@ class User(BaseTable):
 class Role(PostgreSqlConnector.Base):
     __tablename__ = 'role'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = sqla.Column(sqla.String(100), nullable=False)
-    permissions = sqla.Column(sqla.sqla.JSON(none_as_null=False), nullable=False)
+    permissions = sqla.Column(sqla.JSON(none_as_null=False), nullable=False)
     status = sqla.Column(sqla.Enum(StatusConstants))
 
     def __repr__(self) -> str:
@@ -74,10 +74,10 @@ class Role(PostgreSqlConnector.Base):
 class UserRolesByTenant(PostgreSqlConnector.Base):
     __tablename__ = 'user_roles_by_tenant'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    tenant_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('tenant.uuid'))
-    user_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('user.uuid'))
-    role_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('role.uuid'))
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    tenant_uuid = sqla.Column(GUUID(), sqla.ForeignKey('tenant.uuid'))
+    user_uuid = sqla.Column(GUUID(), sqla.ForeignKey('user.uuid'))
+    role_uuid = sqla.Column(GUUID(), sqla.ForeignKey('role.uuid'))
     created_on = sqla.Column(sqla.DateTime(), default=datetime.utcnow)
 
     user = relationship(
@@ -92,7 +92,7 @@ class UserRolesByTenant(PostgreSqlConnector.Base):
 class PermisionTemplate(PostgreSqlConnector.Base):
     __tablename__ = 'permision_template'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = sqla.Column(sqla.String(100), nullable=False, unique=True)
     detail = sqla.Column(sqla.String(), nullable=True)
     resources = sqla.Column(sqla.JSON(none_as_null=False), nullable=False)
@@ -104,7 +104,7 @@ class PermisionTemplate(PostgreSqlConnector.Base):
 class ProductBase(BaseTable):
     __abstract__ = True
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = sqla.Column(sqla.String(100), nullable=False)
     description = sqla.Column(sqla.String())
     # NOTE: We store prices as an integer ammount of cents to avoid presicion errors
@@ -126,8 +126,8 @@ class ProductTemplate(ProductBase):
 class Product(ProductBase):
     __tablename__ = 'product'
 
-    tenant_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('tenant.uuid'))
-    category_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('category.uuid'))
+    tenant_uuid = sqla.Column(GUUID(), sqla.ForeignKey('tenant.uuid'))
+    category_uuid = sqla.Column(GUUID(), sqla.ForeignKey('category.uuid'))
 
     tenant = relationship(
         'Tenant',
@@ -146,8 +146,8 @@ class Product(ProductBase):
 class Stock(PostgreSqlConnector.Base):
     __tablename__ = 'stock'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    product_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('product.uuid'))
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    product_uuid = sqla.Column(GUUID(), sqla.ForeignKey('product.uuid'))
     current_ammount = sqla.Column(sqla.Integer(), nullable=False)
     changed_by = sqla.Column(sqla.Integer(), nullable=False)
     operation = sqla.Column(sqla.Enum(OperationConstants))
@@ -160,7 +160,7 @@ class Stock(PostgreSqlConnector.Base):
 class Category(BaseTable):
     __tablename__ = 'category'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = sqla.Column(sqla.String(100), nullable=False)
     description = sqla.Column(sqla.String())
 
@@ -171,7 +171,7 @@ class Category(BaseTable):
 class Provider(BaseTable):
     __tablename__ = 'provider'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = sqla.Column(sqla.String(100), nullable=False)
     main_address = sqla.Column(sqla.JSON(none_as_null=False), nullable=False)
     phone = sqla.Column(sqla.String(15))
@@ -186,10 +186,10 @@ class Provider(BaseTable):
 class ProductProviders(PostgreSqlConnector.Base):
     __tablename__ = 'product_providers'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
 
-    product_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('product.uuid'))
-    provider_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('provider.uuid'))
+    product_uuid = sqla.Column(GUUID(), sqla.ForeignKey('product.uuid'))
+    provider_uuid = sqla.Column(GUUID(), sqla.ForeignKey('provider.uuid'))
 
     product = relationship(
         'Product',
@@ -208,7 +208,7 @@ class ProductProviders(PostgreSqlConnector.Base):
 class Customer(BaseTable):
     __tablename__ = 'customer'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = sqla.Column(sqla.String(200), nullable=False)
     dni = sqla.Column(sqla.String(20), nullable=False)
     dni_type = sqla.Column(sqla.Enum(DniTypes))
@@ -225,9 +225,9 @@ class Customer(BaseTable):
 class Invoice(BaseTable):
     __tablename__ = 'invoice'
 
-    uuid = sqla.Column(GUUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    product_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('product.uuid'))
-    customer_uuid = sqla.Column(GUUID(as_uuid=True), sqla.ForeignKey('customer.uuid'))
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    product_uuid = sqla.Column(GUUID(), sqla.ForeignKey('product.uuid'))
+    customer_uuid = sqla.Column(GUUID(), sqla.ForeignKey('customer.uuid'))
     product_ammount = sqla.Column(sqla.Integer(), nullable=False)
     # NOTE: We store prices as an integer ammount of cents to avoid presicion errors
     product_unit_price = sqla.Column(sqla.Integer(), nullable=False)
