@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, EmailStr
 
 from .base import BaseTable
 
@@ -9,7 +9,7 @@ from .base import BaseTable
 class User(BaseTable):
     uuid: UUID
     username: str
-    email: str
+    email: EmailStr
     phone: str
 
     class Config:
@@ -21,7 +21,7 @@ class UserCreate(BaseModel):
     roles: Optional[List[UUID]]
     username: str
     password: str
-    email: str
+    email: EmailStr
     phone: str
 
     @validator('roles', 'tenant_uuid')
