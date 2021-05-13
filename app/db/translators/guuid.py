@@ -15,6 +15,7 @@ class GUUID(TypeDecorator):
     CHAR(32), storing as stringified hex values.
     """
     impl = CHAR
+    cache_ok = False
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
