@@ -1,10 +1,11 @@
-from typing import Union
+from typing import List, Tuple, Union
 
 from app.models.ezinventory_models import User, UserRolesByTenant
 from app.serializers.user import UserCreate
 from app.utils.constants import StatusConstants
 from app.utils.functions import filter_dict_keys
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload, subqueryload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .base import BaseManager
@@ -40,3 +41,21 @@ class UserManager(BaseManager):
         await db.commit()
         await db.refresh(db_user)
         return db_user
+
+    @classmethod
+    def group_permissions_by_tenant(cls, user_roles_by_tenant: List[UserRolesByTenant]) -> Union[User, None]:
+        permissions_by_tenant = dict()
+        for role_by_tenant in user_roles_by_tenant:
+            if (tenant_uuid := str(role_by_tenant.tenant_uuid)) not in permissions_by_tenant:
+                permissions_by_tenant[tenant_uuid] = list()
+            permissions_by_tenant[tenant_uuid].extend(role_by_tenant.role.permissions)
+        return permissions_by_tenant
+
+    @classmethod
+    async def authenticate_user(cls, db: AsyncSession, username: str, password: str) -> Tuple[User, dict]:
+        query = select(User)\
+            .options(subqueryload(User.roles_by_tenant).subqueryload('role'))\
+            .where(User.username == username, User.status == StatusConstants.ACTIVE)
+        result = await cls.execute_stmt(db, query)
+        user: User = result.scalars().first()
+        return (user, cls.group_permissions_by_tenant(user.roles_by_tenant)) if user and user.validate_password(password) else (None, {})
