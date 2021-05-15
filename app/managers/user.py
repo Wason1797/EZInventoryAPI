@@ -5,8 +5,8 @@ from app.serializers.user import UserCreate
 from app.utils.constants import StatusConstants
 from app.utils.functions import filter_dict_keys
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload, subqueryload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import subqueryload
 
 from .base import BaseManager
 
