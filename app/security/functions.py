@@ -16,7 +16,7 @@ class JWTFunctions:
 
     @classmethod
     def create_access_token(cls, data: dict, expire_delta: Optional[timedelta] = None) -> str:
-        expire = datetime.utcnow() + expire_delta or cls.DEFAULT_EXPIRE_DELTA
+        expire = datetime.utcnow() + (expire_delta or cls.DEFAULT_EXPIRE_DELTA)
         data_to_encode = {**data, 'exp': expire}
         return jwt.encode(data_to_encode, cls.SECRET_KEY, algorithm=cls.ALGORITHM)
 
