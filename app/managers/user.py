@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Union
 
 from app.models.ezinventory_models import User, UserRolesByTenant
 from app.serializers.user import UserCreate
@@ -16,7 +16,9 @@ class UserManager(BaseManager):
 
     @classmethod
     async def fetch_by_uuid(cls, db: AsyncSession, uuid: str, filter_status: str = StatusConstants.DELETED) -> Union[User, None]:
-        query = select(User).where(User.uuid == uuid, User.status != filter_status)
+        query = select(User)\
+            .options(subqueryload(User.roles_by_tenant).subqueryload('role'))\
+            .where(User.uuid == uuid, User.status != filter_status)
         result = await cls.execute_stmt(db, query)
         return result.scalars().first()
 
@@ -52,10 +54,14 @@ class UserManager(BaseManager):
         return permissions_by_tenant
 
     @classmethod
-    async def authenticate_user(cls, db: AsyncSession, username: str, password: str) -> Tuple[User, dict]:
+    async def fetch_active_user_by_username(cls, db: AsyncSession, username: str) -> Union[User, None]:
         query = select(User)\
             .options(subqueryload(User.roles_by_tenant).subqueryload('role'))\
             .where(User.username == username, User.status == StatusConstants.ACTIVE)
         result = await cls.execute_stmt(db, query)
-        user: User = result.scalars().first()
-        return (user, cls.group_permissions_by_tenant(user.roles_by_tenant)) if user and user.validate_password(password) else (None, {})
+        return result.scalars().first()
+
+    @classmethod
+    async def authenticate_user(cls, db: AsyncSession, username: str, password: str) -> Union[User, None]:
+        user = await cls.fetch_active_user_by_username(db, username)
+        return user if user and user.validate_password(password) else None

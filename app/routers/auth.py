@@ -11,11 +11,11 @@ router = APIRouter()
 
 @router.post('/login', response_model=TokenSerializer)
 async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(PostgreSqlConnector.get_db)):
-    user, permissions_by_tenant = await UserManager.authenticate_user(db, form_data.username, form_data.password)
+    user = await UserManager.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail='Incorrect username or password')
     access_token = JWTFunctions.create_access_token({
         'sub': user.username,
-        'permissions': permissions_by_tenant
+        'user_uuid': str(user.uuid)
     })
     return {'access_token': access_token, 'token_type': 'bearer'}
