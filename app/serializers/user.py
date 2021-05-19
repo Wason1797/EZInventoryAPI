@@ -1,14 +1,9 @@
-from .base import BaseTable
-from pydantic import BaseModel, validator, EmailStr
-from typing import List, Optional
-from pydantic import BaseModel, EmailStr
-from uuid import UUID
 from typing import List
-<< << << < HEAD
+from uuid import UUID
 
-== == == =
+from pydantic import BaseModel, EmailStr
 
->>>>>> > develop
+from .base import BaseTable
 
 
 class User(BaseTable):
