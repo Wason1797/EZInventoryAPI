@@ -1,7 +1,7 @@
 from uuid import UUID
-from typing import List, Optional
+from typing import Optional
 
-from pydantic import BaseModel, Json, validator, AnyURL, EmailStr
+from pydantic import BaseModel, EmailStr
 
 from .base import BaseTable, Address
 
@@ -13,7 +13,7 @@ class Provider(BaseTable):
     phone: str
     email: EmailStr
     description: str
-    meta: Json
+    meta: dict
 
 
 class ProviderCreate(BaseModel):
@@ -22,4 +22,4 @@ class ProviderCreate(BaseModel):
     phone: str
     email: EmailStr
     description: str
-    meta: Optional[Json]
+    meta: Optional[dict]

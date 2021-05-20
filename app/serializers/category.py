@@ -1,7 +1,6 @@
 from uuid import UUID
-from typing import List, Optional
 
-from pydantic import BaseModel, Json, validator, AnyURL
+from pydantic import BaseModel
 
 from .base import BaseTable
 
@@ -14,4 +13,4 @@ class Category(BaseTable):
 
 class CategoryCreate(BaseModel):
     name: str
-    descrition: str
+    description: str

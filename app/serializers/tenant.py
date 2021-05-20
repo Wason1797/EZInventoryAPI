@@ -1,7 +1,6 @@
 from uuid import UUID
-from typing import List, Optional
 
-from pydantic import BaseModel, validator, EmailStr
+from pydantic import BaseModel, EmailStr
 
 from .base import BaseTable, Address
 

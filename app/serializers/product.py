@@ -1,7 +1,7 @@
 from uuid import UUID
-from typing import List, Optional
+from typing import Optional
 
-from pydantic import BaseModel, Json, validator, AnyURL
+from pydantic import BaseModel, AnyURL
 
 from .base import BaseTable
 
@@ -18,7 +18,7 @@ class Product(BaseTable):
     reorder_level: int
     reorder_ammount: int
     picture_path: AnyURL
-    meta: Json
+    meta: dict
 
 
 class ProductCreate(BaseModel):
@@ -32,5 +32,5 @@ class ProductCreate(BaseModel):
     reorder_level: int
     reorder_ammount: int
     picture_path: Optional[AnyURL]
-    meta: Optional[Json]
+    meta: Optional[dict]
     initial_stock: int
