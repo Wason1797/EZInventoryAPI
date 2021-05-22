@@ -2,7 +2,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
 
-from .base import BaseTable, Address
+from .base import Address, BaseTable
 
 
 class Tenant(BaseTable):

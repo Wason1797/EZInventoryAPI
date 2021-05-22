@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from app.utils.constants import StatusConstants
 
+from app.utils.constants import StatusConstants
 from pydantic import BaseModel
 
 

@@ -1,9 +1,9 @@
-from uuid import UUID
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
 
-from .base import BaseTable, Address
+from .base import Address, BaseTable
 
 
 class Provider(BaseTable):
@@ -13,7 +13,7 @@ class Provider(BaseTable):
     phone: str
     email: EmailStr
     description: str
-    meta: dict
+    meta: Optional[dict]
 
 
 class ProviderCreate(BaseModel):

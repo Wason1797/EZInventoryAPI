@@ -1,24 +1,22 @@
-from uuid import UUID
 from typing import Optional
+from uuid import UUID
 
-from pydantic import BaseModel, AnyURL
+from app.utils.constants import MessureUnits
+from pydantic import AnyURL, BaseModel
 
 from .base import BaseTable
 
 
 class Product(BaseTable):
     uuid: UUID
-    tenant_uuid: UUID
-    category: str
     name: str
     description: str
     public_unit_price: int
     provicer_unit_price: int
-    current_stock: int
     reorder_level: int
     reorder_ammount: int
     picture_path: AnyURL
-    meta: dict
+    meta: Optional[dict]
 
 
 class ProductCreate(BaseModel):
@@ -34,3 +32,4 @@ class ProductCreate(BaseModel):
     picture_path: Optional[AnyURL]
     meta: Optional[dict]
     initial_stock: int
+    unit: MessureUnits
