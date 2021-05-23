@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .db.postgre_connector import PostgreSqlConnector
 from .events import startup
-from .routers import index, user, roles
+from .routers import index, role, user
 
 app = FastAPI(title='EzInventory API')
 
@@ -42,8 +42,8 @@ app.include_router(
 )
 
 app.include_router(
-    roles.router,
-    prefix='/roles',
-    tags=["roles"],
+    role.router,
+    prefix='/role',
+    tags=["role"],
     # responses={},
 )

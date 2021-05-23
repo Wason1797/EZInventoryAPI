@@ -1,7 +1,7 @@
 from app.db.postgre_connector import PostgreSqlConnector
-from app.managers.roles import RoleManager
-from app.serializers.roles import Role as RoleSerializer
-from app.serializers.roles import RoleCreate as RoleCreateSerializer
+from app.managers.role import RoleManager
+from app.serializers.role import Role as RoleSerializer
+from app.serializers.role import RoleCreate as RoleCreateSerializer
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 

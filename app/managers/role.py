@@ -1,7 +1,7 @@
 from typing import Union
 
 from app.models.ezinventory_models import Role
-from app.serializers.roles import RoleCreate
+from app.serializers.role import RoleCreate
 from app.utils.constants import StatusConstants
 from app.utils.functions import filter_dict_keys
 from sqlalchemy import select
