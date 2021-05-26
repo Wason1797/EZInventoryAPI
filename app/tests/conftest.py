@@ -9,6 +9,7 @@ from app.security import auth_user, AuthFunctions
 
 # Import fixtures to make them avilable for all tests
 from app.tests.fixtures.user import *
+from app.tests.fixtures.role import *
 
 app.dependency_overrides[PostgreSqlConnector.get_db] = SqLiteConnector.get_db
 app.dependency_overrides[auth_user] = {}
