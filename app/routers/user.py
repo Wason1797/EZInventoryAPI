@@ -13,7 +13,7 @@ router = APIRouter()
 @router.get('/{uuid}', response_model=UserSerializer)
 async def get_user(uuid: str, db: AsyncSession = Depends(PostgreSqlConnector.get_db),
                    user_permissions: dict = Security(auth_user, scopes=[UserScopes.OWN])):
-    AuthFunctions.check_own_permission_by_uuid(uuid, str(user_permissions.get('user').uuid), user_permissions.get('scopes'))
+    AuthFunctions.check_own_permission_by_uuid(uuid, str(getattr(user_permissions.get('user'), 'uuid', None)), user_permissions.get('scopes'))
     return await UserManager.fetch_by_uuid(db, uuid)
 
 
