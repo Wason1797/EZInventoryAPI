@@ -30,3 +30,12 @@ def create_user(client: 'TestClient', user_with_tenant_and_roles: dict):
         json=user_with_tenant_and_roles
     )
     return response
+
+
+@pytest.fixture
+def user_w_password(client: 'TestClient', user_with_tenant_and_roles: dict):
+    response = client.post(
+        '/user',
+        json=user_with_tenant_and_roles
+    )
+    return {**response.json(), 'password': user_with_tenant_and_roles['password']}
