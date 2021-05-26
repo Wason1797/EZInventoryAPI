@@ -4,15 +4,17 @@ import pytest
 from app.db.postgre_connector import PostgreSqlConnector
 from app.db.sqlite_connector import SqLiteConnector
 from app.main import app
-from fastapi.testclient import TestClient
-from app.security import auth_user, AuthFunctions
+from app.security import AuthFunctions, auth_user, mock_auth_user
 
 # Import fixtures to make them avilable for all tests
-from app.tests.fixtures.user import *
 from app.tests.fixtures.role import *
+from app.tests.fixtures.tenant import *
+from app.tests.fixtures.user import *
+
+from fastapi.testclient import TestClient
 
 app.dependency_overrides[PostgreSqlConnector.get_db] = SqLiteConnector.get_db
-app.dependency_overrides[auth_user] = {}
+app.dependency_overrides[auth_user] = mock_auth_user
 
 
 @pytest.fixture
