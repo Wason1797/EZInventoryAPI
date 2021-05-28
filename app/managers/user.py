@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import List, Union
+from typing import List, Set, Union
 
-from app.models.ezinventory_models import User, UserRolesByTenant
+from app.models.ezinventory_models import Tenant, User, UserRolesByTenant
 from app.serializers.user import UserCreate
 from app.utils import functions
-from app.utils.constants import StatusConstants, DbDialects
+from app.utils.constants import DbDialects, StatusConstants
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import subqueryload
@@ -39,6 +39,8 @@ class UserManager(BaseManager):
         user_dict = functions.filter_dict_keys(user.dict(), {'roles', 'tenant_uuid'})
         db_user = cls.add_to_session(db, User(**user_dict))
 
+        if db.bind.dialect.name != DbDialects.POSTGRESQL.value:
+            await db.flush()
         if user.tenant_uuid and user.roles:
             await cls.add_roles_by_tenant_to_user(db, db_user.uuid, user.tenant_uuid, set(user.roles))
 
@@ -87,3 +89,13 @@ class UserManager(BaseManager):
     async def delete_user(cls, db: AsyncSession, uuid: str) -> dict:
         return await cls.uppdate_user_by_uuid(db, uuid, {'status': StatusConstants.DELETED,
                                                          'deleted_on': datetime.utcnow()})
+
+    @classmethod
+    async def fetch_tenants_by_user_uuid(cls, db: AsyncSession, uuid: str) -> Set[Tenant]:
+        query = select(UserRolesByTenant)\
+            .options(subqueryload(UserRolesByTenant.tenant))\
+            .where(UserRolesByTenant.user_uuid == uuid)
+
+        result = await cls.execute_stmt(db, query)
+        response = {item.tenant for item in result.scalars()}
+        return response
