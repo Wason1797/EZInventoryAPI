@@ -1,7 +1,10 @@
+from typing import List
+
 from app.db.postgre_connector import PostgreSqlConnector
 from app.managers.user import UserManager
 from app.security import AuthFunctions, auth_user
 from app.security.common_scopes import AdminScopes, UserScopes
+from app.serializers.tenant import Tenant as TenantSerializer
 from app.serializers.user import User as UserSerializer
 from app.serializers.user import UserCreate as UserCreateSerializer
 from app.serializers.user import UserUpdate as UserUpdateSerializer
@@ -33,3 +36,8 @@ async def basic_user_update(user: UserUpdateSerializer, db: AsyncSession = Depen
 @router.delete('/{uuid}', response_model=UserSerializer)
 async def delete_user(uuid: str, db: AsyncSession = Depends(PostgreSqlConnector.get_db)):
     return await UserManager.delete_user(db, uuid)
+
+
+@router.get('/{uuid}/tenants', response_model=List[TenantSerializer])
+async def get_tenants_related_to_user(uuid: str, db: AsyncSession = Depends(PostgreSqlConnector.get_db)):
+    return await UserManager.fetch_tenants_by_user_uuid(db, uuid)
