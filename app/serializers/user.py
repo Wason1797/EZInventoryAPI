@@ -23,3 +23,8 @@ class UserCreate(BaseModel):
     password: str
     email: EmailStr
     phone: str
+
+
+class UserUpdate(BaseModel):
+    uuid: UUID
+    phone: str
