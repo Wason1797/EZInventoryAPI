@@ -41,3 +41,12 @@ def test_delete_user(client, create_user):
     assert response.status_code == 200
     assert response.json()['uuid'] == user['uuid']
     assert not check_deleted_user.json()
+
+
+def test_get_tenants_related_to_user(client, create_user):
+    user = create_user.json()
+    response = client.get(f"/user/{user['uuid']}/tenants")
+    tenants = response.json()
+    assert response.status_code == 200
+    assert isinstance(tenants, list)
+    assert len(tenants) > 0
