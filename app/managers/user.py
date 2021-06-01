@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Set, Union
 
 from app.models.ezinventory_models import Tenant, User, UserRolesByTenant
-from app.serializers.user import UserCreate
+from app.serializers.user import UserCreate, UserRoleByTenantCreate
 from app.utils import functions
 from app.utils.constants import DbDialects, StatusConstants
 from sqlalchemy import select, update
@@ -25,7 +25,7 @@ class UserManager(BaseManager):
         return result.scalars().first()
 
     @classmethod
-    async def add_roles_by_tenant_to_user(cls, db: AsyncSession, user_uuid: str, tenant_uuid: str, roles: set) -> Union[UserRolesByTenant, None]:
+    def append_roles_by_tenant_to_user(cls, db: AsyncSession, user_uuid: str, tenant_uuid: str, roles: set) -> Union[UserRolesByTenant, None]:
         user_roles_by_tenant = [
             UserRolesByTenant(
                 user_uuid=user_uuid,
@@ -42,7 +42,7 @@ class UserManager(BaseManager):
         if db.bind.dialect.name != DbDialects.POSTGRESQL.value:
             await db.flush()
         if user.tenant_uuid and user.roles:
-            await cls.add_roles_by_tenant_to_user(db, db_user.uuid, user.tenant_uuid, set(user.roles))
+            cls.append_roles_by_tenant_to_user(db, db_user.uuid, user.tenant_uuid, set(user.roles))
 
         await db.commit()
         await db.refresh(db_user)
@@ -71,7 +71,7 @@ class UserManager(BaseManager):
         return user if user and user.validate_password(password) else None
 
     @classmethod
-    async def uppdate_user_by_uuid(cls, db: AsyncSession, uuid: str, update_values: dict) -> dict:
+    async def uppdate_user_by_uuid(cls, db: AsyncSession, uuid: str, update_values: dict) -> Union[dict, User]:
         query = update(User)\
             .where(User.uuid == uuid)\
             .values(**update_values)
@@ -97,5 +97,13 @@ class UserManager(BaseManager):
             .where(UserRolesByTenant.user_uuid == uuid)
 
         result = await cls.execute_stmt(db, query)
-        response = {item.tenant for item in result.scalars()}
-        return response
+        return {item.tenant for item in result.scalars()}
+
+    @classmethod
+    async def create_user_roles_by_tenant(cls, db: AsyncSession, user_roles_by_tenant: UserRoleByTenantCreate):
+        new_roles_by_tenant = cls.append_roles_by_tenant_to_user(db, user_roles_by_tenant.user_uuid,
+                                                                 user_roles_by_tenant.tenant_uuid,
+                                                                 user_roles_by_tenant.roles)
+
+        await db.commit()
+        return new_roles_by_tenant
