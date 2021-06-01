@@ -28,3 +28,19 @@ class UserCreate(BaseModel):
 class UserUpdate(BaseModel):
     uuid: UUID
     phone: str
+
+
+class UserRoleByTenant(BaseModel):
+    uuid: UUID
+    user_uuid: UUID
+    tenant_uuid: UUID
+    role_uuid: UUID
+
+    class Config:
+        orm_mode = True
+
+
+class UserRoleByTenantCreate(BaseModel):
+    user_uuid: UUID
+    tenant_uuid: UUID
+    roles: List[UUID]
