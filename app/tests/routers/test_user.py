@@ -50,3 +50,26 @@ def test_get_tenants_related_to_user(client, create_user):
     assert response.status_code == 200
     assert isinstance(tenants, list)
     assert len(tenants) > 0
+
+
+def test_add_tenant_role_to_user(client, create_user, create_role):
+    user = create_user.json()
+    user_uuid = user['uuid']
+    role_uuid = create_role.json()['uuid']
+    tenant_response = client.get(f"/user/{user_uuid}/tenants")
+    tenant_uuid = tenant_response.json().pop()['uuid']
+    response = client.post('/user/role',
+                           json={
+                               'user_uuid': user_uuid,
+                               'tenant_uuid': tenant_uuid,
+                               'roles': [role_uuid, ]
+                           })
+
+    result = response.json()
+    assert response.status_code == 200
+    assert isinstance(result, list)
+    assert len(result) == 1
+    new_user_role_by_tenant = result.pop()
+    assert new_user_role_by_tenant['tenant_uuid'] == tenant_uuid
+    assert new_user_role_by_tenant['role_uuid'] == role_uuid
+    assert new_user_role_by_tenant['user_uuid'] == user_uuid
