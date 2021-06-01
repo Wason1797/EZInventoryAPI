@@ -8,6 +8,8 @@ from app.serializers.tenant import Tenant as TenantSerializer
 from app.serializers.user import User as UserSerializer
 from app.serializers.user import UserCreate as UserCreateSerializer
 from app.serializers.user import UserUpdate as UserUpdateSerializer
+from app.serializers.user import UserRoleByTenant as UserRoleByTenantSerializer
+from app.serializers.user import UserRoleByTenantCreate as UserRoleByTenantCreateSerializer
 from fastapi import APIRouter, Depends, Security
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,3 +43,8 @@ async def delete_user(uuid: str, db: AsyncSession = Depends(PostgreSqlConnector.
 @router.get('/{uuid}/tenants', response_model=List[TenantSerializer])
 async def get_tenants_related_to_user(uuid: str, db: AsyncSession = Depends(PostgreSqlConnector.get_db)):
     return await UserManager.fetch_tenants_by_user_uuid(db, uuid)
+
+
+@router.post('/role', response_model=List[UserRoleByTenantSerializer])
+async def add_tenant_role_to_user(user_roles_by_tenant: UserRoleByTenantCreateSerializer, db: AsyncSession = Depends(PostgreSqlConnector.get_db)):
+    return await UserManager.create_user_roles_by_tenant(db, user_roles_by_tenant)
