@@ -32,4 +32,3 @@ class ProductCreate(BaseModel):
     picture_path: Optional[AnyURL]
     meta: Optional[dict]
     initial_stock: int
-    unit: MessureUnits
