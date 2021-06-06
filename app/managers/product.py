@@ -3,7 +3,7 @@ from datetime import datetime
 
 from app.models.ezinventory_models import Product, Stock, OperationConstants
 from app.serializers.product import ProductCreate
-from app.utils.constants import DbDialects, StatusConstants
+from app.utils.constants import StatusConstants
 from app.utils.functions import filter_dict_keys
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,14 +30,15 @@ class ProductManager(BaseManager):
                 operation=OperationConstants.ADD
             )
         ]
-        return cls.add_to_session(db, initial_stock)
+        return cls.add_to_session(db, initial_stock_entry)
 
     @classmethod
     async def create_product(cls, db: AsyncSession, product: ProductCreate) -> Union[Product, None]:
-        product_dict = filter_dict_keys(product.dict(), {'initial_stock'})
+        product_dict = filter_dict_keys(product.dict(), {'initial_stock', 'provider_uuid'})
         db_product = cls.add_to_session(db, Product(**product_dict))
-
-        await add_first_stock_entry(db, db_product.uuid, product.initial_stock)
+        
+        await db.flush()
+        await cls.add_first_stock_entry(db, db_product.uuid, product.initial_stock)
 
         await db.commit()
         await db.refresh(db_product)
