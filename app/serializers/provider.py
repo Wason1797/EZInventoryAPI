@@ -15,6 +15,9 @@ class Provider(BaseTable):
     description: str
     meta: Optional[dict]
 
+    class Config:
+        orm_mode = True
+
 
 class ProviderCreate(BaseModel):
     name: str
