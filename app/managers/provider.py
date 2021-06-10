@@ -38,5 +38,5 @@ class ProviderManager(BaseManager):
 
     @classmethod
     async def delete_provider(cls, db: AsyncSession, uuid: str) -> dict:
-        return await cls.uppdate_provider_by_uuid(db, uuid, {'status': StatusConstants.DELETED,
-                                                             'deleted_on': datetime.utcnow()})
+        return await cls.update_provider_by_uuid(db, uuid, {'status': StatusConstants.DELETED,
+                                                            'deleted_on': datetime.utcnow()})
