@@ -36,5 +36,5 @@ class BaseManager:
         else:
             await cls.execute_stmt(db, update_stmt)
             await db.commit()
-            result = await fetch_coro(db, uuid, filter_status=None)
+            result = await fetch_coro(db, uuid, filtered_status=None)
             return result

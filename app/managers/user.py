@@ -17,10 +17,10 @@ class UserManager(BaseManager):
     columns = User.__table__.columns
 
     @classmethod
-    async def fetch_by_uuid(cls, db: AsyncSession, uuid: str, filter_status: str = StatusConstants.DELETED) -> Union[User, None]:
+    async def fetch_by_uuid(cls, db: AsyncSession, uuid: str, filtered_status: str = StatusConstants.DELETED) -> Union[User, None]:
         query = select(User)\
             .options(subqueryload(User.roles_by_tenant).subqueryload('role'))\
-            .where(User.uuid == uuid, User.status != filter_status)
+            .where(User.uuid == uuid, User.status != filtered_status)
         result = await cls.execute_stmt(db, query)
         return result.scalars().first()
 
