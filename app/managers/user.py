@@ -75,15 +75,8 @@ class UserManager(BaseManager):
         query = update(User)\
             .where(User.uuid == uuid)\
             .values(**update_values)
-        if db.bind.dialect.name == DbDialects.POSTGRESQL.value:
-            result = (await cls.execute_stmt(db, query.returning(*cls.columns))).first()
-            await db.commit()
-            return functions.build_from_key_value_arrays(cls.columns.keys(), result)
-        else:
-            await cls.execute_stmt(db, query)
-            await db.commit()
-            result = await cls.fetch_by_uuid(db, uuid, filter_status=None)
-            return result
+        result = await cls.execute_update_stmt_by_uuid(db, query, cls.columns, cls.fetch_by_uuid, uuid)
+        return result
 
     @classmethod
     async def delete_user(cls, db: AsyncSession, uuid: str) -> dict:
