@@ -23,3 +23,11 @@ class ProviderCreate(BaseModel):
     email: EmailStr
     description: str
     meta: Optional[dict]
+
+
+class ProviderUpdate(BaseModel):
+    uuid: UUID
+    main_address: Optional[Address]
+    phone: Optional[str]
+    description: Optional[str]
+    meta: Optional[dict]
