@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from app.utils.constants import MessureUnits
-from pydantic import AnyURL, BaseModel
+from pydantic import AnyUrl, BaseModel
 
 from .base import BaseTable
 
@@ -15,7 +15,7 @@ class Product(BaseTable):
     provicer_unit_price: int
     reorder_level: int
     reorder_ammount: int
-    picture_path: AnyURL
+    picture_path: AnyUrl
     meta: Optional[dict]
 
 
@@ -29,6 +29,6 @@ class ProductCreate(BaseModel):
     provicer_unit_price: int
     reorder_level: int
     reorder_ammount: int
-    picture_path: Optional[AnyURL]
+    picture_path: Optional[AnyUrl]
     meta: Optional[dict]
     initial_stock: int
