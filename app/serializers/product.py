@@ -24,7 +24,6 @@ class Product(BaseTable):
 class ProductCreate(BaseModel):
     tenant_uuid: UUID
     category_uuid: UUID
-    provider_uuid: Optional[UUID]
     name: str
     description: str
     public_unit_price: int
@@ -34,3 +33,16 @@ class ProductCreate(BaseModel):
     picture_path: Optional[AnyUrl]
     meta: Optional[dict]
     initial_stock: int
+
+
+class ProductUpdate(BaseModel):
+    tenant_uuid: Optional[UUID]
+    category_uuid: Optional[UUID]
+    name: Optional[str]
+    description: Optional[str]
+    public_unit_price: Optional[int]
+    provicer_unit_price: Optional[int]
+    reorder_level: Optional[int]
+    reorder_ammount: Optional[int]
+    picture_path: Optional[AnyUrl]
+    meta: Optional[dict]

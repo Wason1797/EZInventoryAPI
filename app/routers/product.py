@@ -2,6 +2,7 @@ from app.db.postgre_connector import PostgreSqlConnector
 from app.managers.product import ProductManager
 from app.serializers.product import Product as ProductSerializer
 from app.serializers.product import ProductCreate as ProductCreateSerializer
+from app.serializers.product import ProductUpdate as ProductUpdateSerializer
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,8 +20,8 @@ async def create_product(product: ProductCreateSerializer, db: AsyncSession = De
 
 
 @router.put('/{uuid}', response_model=ProductSerializer)
-async def update_product(uuid: str, product: ProductSerializer, db: AsyncSession = Depends(PostgreSqlConnector.get_db)):
-    return await ProductManager.edit_product(db, uuid, product.dict())
+async def update_product(uuid: str, product: ProductUpdateSerializer, db: AsyncSession = Depends(PostgreSqlConnector.get_db)):
+    return await ProductManager.update_product_by_uuid(db, uuid, product.dict())
 
 
 @router.delete('/{uuid}', response_model=ProductSerializer)

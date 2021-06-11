@@ -16,3 +16,7 @@ class DniTypes(Enum):
     STANDARD = 'STANDARD'
     RUC = 'RUC'
     PASSPORT = 'PASSPORT'
+
+class DbDialects(Enum):
+    POSTGRESQL = 'postgresql'
+    SQLITE = 'sqlite'
