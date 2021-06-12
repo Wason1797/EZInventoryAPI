@@ -17,6 +17,14 @@ class DniTypes(Enum):
     RUC = 'RUC'
     PASSPORT = 'PASSPORT'
 
+
+class MessureUnits(Enum):
+    UNITS = "UNIT"
+    GRAMS = "GRAMS"
+    LITRE = "LITRE"
+    METERS = "METER"
+
+
 class DbDialects(Enum):
     POSTGRESQL = 'postgresql'
     SQLITE = 'sqlite'
