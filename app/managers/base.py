@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Coroutine, Union
 
 from sqlalchemy.engine.result import Result
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,15 +16,16 @@ class BaseManager:
         return await db.execute(stmt)
 
     @classmethod
-    async def execute_update_stmt(cls, db: AsyncSession, stmt: Executable, return_function: Callable, **kwargs: Any) -> dict:
-        if db.bind.dialect.name == DbDialects.POSTGRESQL.value:
+    async def execute_update_stmt(cls, db: AsyncSession, stmt: Executable, return_corutine: Coroutine, 
+                                    **corutine_parameters: dict) -> Union[dict, type(model)]:
+        if db.bind.dialect.name != DbDialects.POSTGRESQL.value:
             result = (await db.execute(stmt.returning(*cls.columns))).first()
             await db.commit()
             return build_from_key_value_arrays(cls.columns.keys(), result)
         else:
             await db.execute(stmt)
             await db.commit()
-            result = await return_function(db, **kwargs)
+            result = await return_corutine(db, **corutine_parameters)
             return result
 
     @classmethod
