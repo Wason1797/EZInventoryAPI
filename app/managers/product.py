@@ -4,7 +4,7 @@ from datetime import datetime
 from app.models.ezinventory_models import Product, Stock, OperationConstants
 from app.serializers.product import ProductCreate
 from app.utils.constants import DbDialects, StatusConstants
-from app.utils.functions import filter_dict_keys, build_from_key_value_arrays, clean_dict
+from app.utils import functions
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,9 +22,10 @@ class ProductManager(BaseManager):
         return result.scalars().first()
 
     @classmethod
-    async def add_first_stock_entry(cls, db:AsyncSession, product_uuid: str, initial_stock: int):
+    async def add_stock_entry(cls, db:AsyncSession, product_uuid: str, initial_stock: int, user_uuid: str):
         initial_stock_entry = [
             Stock(
+                user_uuid=user_uuid,
                 product_uuid=product_uuid,
                 current_ammount=initial_stock,
                 changed_by=initial_stock,
@@ -35,11 +36,11 @@ class ProductManager(BaseManager):
 
     @classmethod
     async def create_product(cls, db: AsyncSession, product: ProductCreate) -> Union[Product, None]:
-        product_dict = filter_dict_keys(product.dict(), {'initial_stock'})
+        product_dict = functions.filter_dict_keys(product.dict(), {'initial_stock', 'user_uuid'})
         db_product = cls.add_to_session(db, Product(**product_dict))
         
         await db.flush()
-        await cls.add_first_stock_entry(db, db_product.uuid, product.initial_stock)
+        await cls.add_stock_entry(db, db_product.uuid, product.initial_stock, product.user_uuid)
 
         await db.commit()
         await db.refresh(db_product)
@@ -47,9 +48,10 @@ class ProductManager(BaseManager):
 
     @classmethod
     async def update_product_by_uuid(cls, db: AsyncSession, uuid: str, update_values: dict) -> Union[dict, Product]:
+        product_update = functions.filter_dict_keys(update_values, {}, prune_null=True)
         query = update(Product)\
             .where(Product.uuid == uuid)\
-            .values(**clean_dict(update_values))
+            .values(product_update)
 
         result = await cls.execute_update_stmt(db, query, cls.fetch_by_uuid, uuid=uuid, filtered_status=None)
 

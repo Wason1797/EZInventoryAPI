@@ -24,6 +24,7 @@ class Product(BaseTable):
 class ProductCreate(BaseModel):
     tenant_uuid: UUID
     category_uuid: UUID
+    user_uuid: UUID
     name: str
     description: str
     public_unit_price: int

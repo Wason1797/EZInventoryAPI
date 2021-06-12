@@ -18,7 +18,7 @@ class BaseManager:
     @classmethod
     async def execute_update_stmt(cls, db: AsyncSession, stmt: Executable, return_corutine: Coroutine, 
                                     **corutine_parameters: dict) -> Union[dict, type(model)]:
-        if db.bind.dialect.name != DbDialects.POSTGRESQL.value:
+        if db.bind.dialect.name == DbDialects.POSTGRESQL.value:
             result = (await db.execute(stmt.returning(*cls.columns))).first()
             await db.commit()
             return build_from_key_value_arrays(cls.columns.keys(), result)
