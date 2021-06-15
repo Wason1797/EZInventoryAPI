@@ -33,7 +33,7 @@ class ProviderManager(BaseManager):
         query = update(Provider)\
             .where(Provider.uuid == uuid)\
             .values(**update_values)
-        result = await cls.execute_update_stmt_by_uuid(db, query, cls.columns, cls.fetch_by_uuid, uuid)
+        result = await cls.execute_update_stmt(db, query, cls.fetch_by_uuid, uuid=uuid, filtered_status=None)
         return result
 
     @classmethod
