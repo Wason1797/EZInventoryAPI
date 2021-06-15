@@ -10,7 +10,9 @@ from app.security import AuthFunctions, auth_user
 from app.tests.fixtures.provider import *
 from app.tests.fixtures.role import *
 from app.tests.fixtures.tenant import *
+from app.tests.fixtures.category import *
 from app.tests.fixtures.user import *
+from app.tests.fixtures.product import *
 
 from app.tests.test_utils.mocks import mock_auth_user
 from fastapi.testclient import TestClient
