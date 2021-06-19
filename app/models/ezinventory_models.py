@@ -43,6 +43,8 @@ class User(BaseTable):
     email = sqla.Column(sqla.String(), nullable=False)
     phone = sqla.Column(sqla.String(15))
 
+    roles_by_tenant = relationship('UserRolesByTenant')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.password:
@@ -82,8 +84,19 @@ class UserRolesByTenant(PostgreSqlConnector.Base):
 
     user = relationship(
         'User',
-        primaryjoin=f"and_(UserRolesByTenant.user_uuid==User.uuid, User.status!='{StatusConstants.DELETED}')",
-        backref=backref('roles_by_tenant', order_by=user_uuid))
+        primaryjoin=f"and_(UserRolesByTenant.user_uuid==User.uuid, User.status!='{StatusConstants.DELETED.value}')",
+        back_populates='roles_by_tenant'
+    )
+
+    role = relationship(
+        'Role',
+        primaryjoin=f"and_(UserRolesByTenant.role_uuid==Role.uuid, Role.status!='{StatusConstants.DELETED.value}')"
+    )
+
+    tenant = relationship(
+        'Tenant',
+        primaryjoin=f"and_(UserRolesByTenant.tenant_uuid==Tenant.uuid, Tenant.status!='{StatusConstants.DELETED.value}')",
+    )
 
     def __repr__(self) -> str:
         return f'UserRoleBytenant[{self.uuid}] tenant={self.tenant_uuid} user={self.user_uuid}'
@@ -104,7 +117,6 @@ class PermisionTemplate(PostgreSqlConnector.Base):
 class ProductBase(BaseTable):
     __abstract__ = True
 
-    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = sqla.Column(sqla.String(100), nullable=False)
     description = sqla.Column(sqla.String())
     # NOTE: We store prices as an integer ammount of cents to avoid presicion errors
@@ -112,12 +124,13 @@ class ProductBase(BaseTable):
     provicer_unit_price = sqla.Column(sqla.Integer(), nullable=False)
     reorder_level = sqla.Column(sqla.Integer(), nullable=True)
     reorder_ammount = sqla.Column(sqla.Integer(), nullable=True)
-    picture_path = sqla.Column(sqla.String())
+    picture_path = sqla.Column(sqla.String(), nullable=True)
     meta = sqla.Column(sqla.JSON(none_as_null=False), nullable=False)
 
 
 class ProductTemplate(ProductBase):
     __tablename__ = 'product_template'
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
 
     def __repr__(self) -> str:
         return f'ProductTemplate[{self.uuid}] {self.name}'
@@ -126,17 +139,18 @@ class ProductTemplate(ProductBase):
 class Product(ProductBase):
     __tablename__ = 'product'
 
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     tenant_uuid = sqla.Column(GUUID(), sqla.ForeignKey('tenant.uuid'))
     category_uuid = sqla.Column(GUUID(), sqla.ForeignKey('category.uuid'))
 
     tenant = relationship(
         'Tenant',
-        primaryjoin=f"and_(Product.tenant_uuid==Tenant.uuid, Tenant.status!='{StatusConstants.DELETED}')",
+        primaryjoin=f"and_(Product.tenant_uuid==Tenant.uuid, Tenant.status!='{StatusConstants.DELETED.value}')",
         backref=backref('products'))
 
     category = relationship(
         'Category',
-        primaryjoin=f"and_(Product.category_uuid==Category.uuid, Category.status!='{StatusConstants.DELETED}')",
+        primaryjoin=f"and_(Product.category_uuid==Category.uuid, Category.status!='{StatusConstants.DELETED.value}')",
         backref=backref('products'))
 
     def __repr__(self) -> str:
@@ -147,7 +161,8 @@ class Stock(PostgreSqlConnector.Base):
     __tablename__ = 'stock'
 
     uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    product_uuid = sqla.Column(GUUID(), sqla.ForeignKey('product.uuid'))
+    product_uuid = sqla.Column(GUUID(), sqla.ForeignKey('product.uuid'), nullable=False)
+    user_uuid = sqla.Column(GUUID(), sqla.ForeignKey('user.uuid'), nullable=False)
     current_ammount = sqla.Column(sqla.Integer(), nullable=False)
     changed_by = sqla.Column(sqla.Integer(), nullable=False)
     operation = sqla.Column(sqla.Enum(OperationConstants))
@@ -193,12 +208,12 @@ class ProductProviders(PostgreSqlConnector.Base):
 
     product = relationship(
         'Product',
-        primaryjoin=f"and_(ProductProviders.product_uuid==Product.uuid, Product.status!='{StatusConstants.DELETED}')",
+        primaryjoin=f"and_(ProductProviders.product_uuid==Product.uuid, Product.status!='{StatusConstants.DELETED.value}')",
         backref=backref('providers', order_by=uuid))
 
     provider = relationship(
         'Provider',
-        primaryjoin=f"and_(ProductProviders.provider_uuid==Provider.uuid, Provider.status!='{StatusConstants.DELETED}')",
+        primaryjoin=f"and_(ProductProviders.provider_uuid==Provider.uuid, Provider.status!='{StatusConstants.DELETED.value}')",
         backref=backref('products', order_by=uuid))
 
     def __repr__(self) -> str:
@@ -226,8 +241,9 @@ class Invoice(BaseTable):
     __tablename__ = 'invoice'
 
     uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    product_uuid = sqla.Column(GUUID(), sqla.ForeignKey('product.uuid'))
-    customer_uuid = sqla.Column(GUUID(), sqla.ForeignKey('customer.uuid'))
+    product_uuid = sqla.Column(GUUID(), sqla.ForeignKey('product.uuid'), nullable=False)
+    customer_uuid = sqla.Column(GUUID(), sqla.ForeignKey('customer.uuid'), nullable=False)
+    user_uuid = sqla.Column(GUUID(), sqla.ForeignKey('user.uuid'), nullable=False)
     product_ammount = sqla.Column(sqla.Integer(), nullable=False)
     # NOTE: We store prices as an integer ammount of cents to avoid presicion errors
     product_unit_price = sqla.Column(sqla.Integer(), nullable=False)
