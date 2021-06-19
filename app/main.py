@@ -55,3 +55,17 @@ app.include_router(
     tags=["role"],
     # responses={},
 )
+
+app.include_router(
+    category.router,
+    prefix='/category',
+    tags=["category"],
+    # responses={},
+)
+
+app.include_router(
+    product.router,
+    prefix='/product',
+    tags=["product"],
+    # responses={},
+)

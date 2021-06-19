@@ -13,7 +13,6 @@ from app.tests.fixtures.tenant import *
 from app.tests.fixtures.category import *
 from app.tests.fixtures.user import *
 from app.tests.fixtures.product import *
-from app.tests.fixtures.category import *
 
 from fastapi.testclient import TestClient
 
