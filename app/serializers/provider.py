@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
@@ -34,3 +34,17 @@ class ProviderUpdate(BaseModel):
     phone: Optional[str]
     description: Optional[str]
     meta: Optional[dict]
+
+
+class ProviderProducts(BaseModel):
+    uuid: UUID
+    product_uuid: UUID
+    provider_uuid: UUID
+
+    class Config:
+        orm_mode = True
+
+
+class ProviderProductsCreate(BaseModel):
+    product_uuids: List[UUID]
+    provider_uuid: UUID
