@@ -46,6 +46,46 @@ def test_provider_basic_update(client, create_provider, update_values):
         assert updated_provider[key] == value
 
 
+def test_add_products_to_provider(client, create_provider, create_product):
+    provider = create_provider.json()
+    product = create_product.json()
+    response = client.put(
+        '/provider/products',
+        json={
+            'provider_uuid': provider['uuid'],
+            'product_uuids': [product['uuid']]
+
+        }
+    )
+    products_added = response.json()
+    assert response.status_code == 200
+    assert isinstance(products_added, list)
+    assert len(products_added) == 1
+    product_added = products_added.pop()
+    assert product_added['provider_uuid'] == provider['uuid']
+    assert product_added['provider_uuid'] == provider['uuid']
+
+
+def test_get_providers_by_product_uuid(client, create_provider, create_product):
+    created_provider = create_provider.json()
+    product = create_product.json()
+    client.put(
+        '/provider/products',
+        json={
+            'provider_uuid': created_provider['uuid'],
+            'product_uuids': [product['uuid']]
+
+        }
+    )
+    response = client.get(f'/provider/product/{product["uuid"]}')
+    providers = response.json()
+    assert response.status_code == 200
+    assert isinstance(providers, list)
+    assert len(providers) == 1
+    provider = providers.pop()
+    assert provider['uuid'] == created_provider['uuid']
+
+
 def test_delete_provider(client, create_provider):
     provider = create_provider.json()
     uri = f"/provider/{provider['uuid']}"
