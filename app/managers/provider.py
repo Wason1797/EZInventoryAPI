@@ -1,11 +1,12 @@
 from datetime import datetime
-from typing import Union
+from typing import List, Union
 
-from app.models.ezinventory_models import Provider
+from app.models.ezinventory_models import ProductProviders, Provider
 from app.serializers.provider import ProviderCreate
 from app.utils.constants import StatusConstants
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import subqueryload
 
 from .base import BaseManager
 
@@ -19,6 +20,22 @@ class ProviderManager(BaseManager):
         query = select(Provider).where(Provider.uuid == uuid, Provider.status != filtered_status)
         result = await cls.execute_stmt(db, query)
         return result.scalars().first()
+
+    @classmethod
+    async def fetch_by_product_uuid(cls, db: AsyncSession, product_uuid: str) -> Union[Provider, None]:
+        query = select(ProductProviders)\
+            .options(subqueryload(ProductProviders.provider))\
+            .where(ProductProviders.product_uuid == product_uuid)
+        result = await cls.execute_stmt(db, query)
+        return [row.provider for row in result.scalars()]
+
+    @classmethod
+    async def add_products_to_provider(cls, db: AsyncSession, provider_uuid: str, product_uuids: List[str]):
+        products_for_provider = [ProductProviders(provider_uuid=provider_uuid,
+                                                  product_uuid=product_uuid) for product_uuid in set(product_uuids)]
+        products_for_provider = cls.add_to_session(db, products_for_provider)
+        await db.commit()
+        return products_for_provider
 
     @classmethod
     async def create_provider(cls, db: AsyncSession, provider: ProviderCreate) -> Union[Provider, None]:
