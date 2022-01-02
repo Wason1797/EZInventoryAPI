@@ -264,3 +264,11 @@ class Invoice(BaseTable):
 
     def __repr__(self) -> str:
         return f'Invoice[{self.uuid}] customer={self.customer_uuid} product={self.product_uuid}'
+
+
+class ActionLog(PostgreSqlConnector.Base):
+    __tablename__ = 'action_log'
+    uuid = sqla.Column(GUUID(), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    action = sqla.Column(sqla.String(), nullable=False)
+    user_uuid = sqla.Column(GUUID(), sqla.ForeignKey('user.uuid'), nullable=True)
+    created_on = sqla.Column(sqla.DateTime(), default=datetime.utcnow)
